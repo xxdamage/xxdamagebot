@@ -27,7 +27,7 @@ sudo apt-get update && sudo apt-get install libreadline-dev libconfig-dev libssl
 Iniciar QuickBot: 
 
 ```bash
-cd mi_bot
+cd xxdamagebot
 ./run.sh
 ```
 
@@ -59,5 +59,4 @@ Más funciones del bash:
 ./run.sh attach secure
 ```
 --------------------
-[![https://telegram.me/jarriz](https://img.shields.io/badge/Telegram-%40Jarriz-green.svg)](https://telegram.me/jarriz)
-[![https://telegram.me/jarriz](https://img.shields.io/badge/Chat-soporte-orange.svg)](https://telegram.me/equipoQuickSilver)
+[![https://telegram.me/xxdamage]
