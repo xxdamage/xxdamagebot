@@ -59,4 +59,4 @@ Más funciones del bash:
 ./run.sh attach secure
 ```
 --------------------
-[![https://telegram.me/xxdamage]
+[![xxdamage](https://telegram.me/xxdamage)
