@@ -24,7 +24,7 @@ sudo apt-get update && sudo apt-get install libreadline-dev libconfig-dev libssl
  sudo apt-get install lua-dkjson -y
  ```
  
-Iniciar QuickBot: 
+Iniciar xxdamagebot: 
 
 ```bash
 cd xxdamagebot
