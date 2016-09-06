@@ -11,7 +11,7 @@ Clonar repositorio:
 
 ```bash
 # Clonar xxdamagebot
-git clone https://github.com/xxdamage/QuickBot mi_bot
+git clone https://github.com/xxdamage/xxdamagebot.git
 ```
 Instalar dependencias:
 
