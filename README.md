@@ -31,9 +31,7 @@ cd xxdamagebot
 ./run.sh
 ```
 
-Ingresas a ``data/key`` y reemplazas toda la linea por el token que te dió [@botfather](http://telegram.me/botfather)
-
-Despúes, el bot ya estará funcionando si lo haz configurado bien, cualquier falla vuelvelo a configurar.
+Despúes, el bot ya estará funcionando si lo has configurado bien, cualquier fallo, vuelvelo a configurar.
 
 
 
