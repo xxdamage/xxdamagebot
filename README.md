@@ -25,11 +25,9 @@ sudo apt-get update && sudo apt-get install libreadline-dev libconfig-dev libssl
 Iniciar xxdamagebot: 
 
 ```bash
-cd mi_bot
+cd xxdamagebot
 ./run.sh
 ```
-
-Ingresas a ``data/key`` y reemplazas toda la linea por el token que te dió [@botfather](http://telegram.me/botfather)
 
 Despúes, el bot ya estará funcionando si lo haz configurado bien, cualquier fallo, vuelvelo a configurar.
 
