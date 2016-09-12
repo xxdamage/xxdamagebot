@@ -1,3 +1,5 @@
+-- detecta alias de canales y supergrupos
+
 local action = function(msg, blocks)
 	if msg.chat.type == 'private' or roles.is_admin(msg) then return true end
 	if not msg.entities then return true end
