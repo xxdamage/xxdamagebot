@@ -62,5 +62,5 @@ Envia tus pullrequest para mejorar el código.
 
 
 
-
+agradecimientos a jarriz por algunos codigos
 --------------------
