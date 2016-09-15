@@ -37,6 +37,7 @@ return {
         'res.lua',
     	'anti-spampro.lua',
 		'topic.lua',
+		'urbandictionary.lua',
 		'antispam.lua',
 		'sera.lua',
 		'calc.lua',
