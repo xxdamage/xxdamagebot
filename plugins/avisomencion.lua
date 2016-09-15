@@ -1,10 +1,10 @@
 local triggers = {
 	"[Xx][Xx][Dd][Aa][Mm][Aa][Gg][Ee]",   --cambia los triggers por tu nombre o alias
-    "@xxdamage"
+        "@xxdamage"
 }
 
 local action = function(msg, matches, blocks, ln)
-if db:hget('chat:'..msg.chat.id..':settings', 'mencion') == 'enable' then
+	if db:hget('chat:'..msg.chat.id..':settings', 'mencion') == 'enable' then
 	if msg.from.id == config.admin.owner then return
 end
 	user = msg.from.first_name
