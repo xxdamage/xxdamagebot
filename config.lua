@@ -60,7 +60,6 @@ return {
 		'private.lua',
 		'admin.lua',
 		'restore.lua',
-		'test.lua',
 		'extra.lua', --has to be the last
 	},
 	multipurpose_plugins = {
