@@ -5,7 +5,7 @@ local triggers = {
 
 local action = function(msg, matches, blocks, ln)
 if db:hget('chat:'..msg.chat.id..':settings', 'mencion') == 'enable' then
-	if roles.is_bot_owner(msg) then return
+	if msg.from.id == config.admin.owner then return
 end
 	user = msg.from.first_name
 	api.sendReply(msg, '▶️ _mencion enviada_', true)
