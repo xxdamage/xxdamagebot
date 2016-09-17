@@ -11,7 +11,6 @@ end
      action_sucess = api.banUser(msg.chat.id, msg.from.id)
      if action_sucess then
      api.sendMessage(msg.chat.id, name.. ' ('..id.. ') ha sido *banead@* por hacer SPAM 🔨 Para conocer mas sobre el spam y los terminos, usa /spamhelp\n\n🔸 `Informe enviado al administrador` ', true)
-     api.sendAudio(msg.chat.id, './archivos/audio/haha.ogg')
      misc.forwardToAdmins(msg.chat.id, msg.message_id)
      misc.sendMessageToAdmins(msg.chat.id, '👆 SPAM en el grupo: ➡️ *'..msg.chat.title..'*')
         end
