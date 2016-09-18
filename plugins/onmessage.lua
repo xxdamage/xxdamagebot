@@ -162,6 +162,9 @@ local pre_process = function(msg)
     if is_blocked(msg.from.id) then --ignore blocked users
         return msg, true --if an user is blocked, don't go through plugins
     end
+    if user_gbanned(msg) then
+       api.kickChatMember(msg.chat.id, msg.from.id)
+end
     
     return msg
 end
