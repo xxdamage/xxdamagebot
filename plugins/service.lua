@@ -74,6 +74,10 @@ local action = function(msg, blocks)
 			else
 				api.unbanUser(msg.chat.id, msg.added.id, true)
 			end
+			if user_in_gbans(msg) then
+			api.kickChatMember(msg.chat.id, msg.added.id)
+		    	return
+		end
 		end
 		
 		--[[if msg.chat.type == 'supergroup' and db:sismember('chat:'..msg.chat.id..':prevban') then
