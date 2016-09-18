@@ -27,6 +27,38 @@ get_coords = function(input)
 
 end
 
+--GBAN
+
+function user_gbanned(msg)
+local var = false
+  for v,users in pairs(gbans.gbans) do
+    if msg.from.id == users then
+      var = true
+      if msg.from.username then
+      	print("Usuario globalmente baneado ("..msg.from.id..")", msg.from.first_name.."(@"..msg.from.username..")")
+      else
+      	print("Usuario globalmente baneado ("..msg.from.id..")", msg.from.first_name)
+      end
+    end
+  end
+  return var
+end
+
+function user_in_gbans(msg)
+local var = false
+  for v,users in pairs(gbans.gbans) do
+     if msg.added.id == users then
+     var = true
+     if msg.added.username then
+      	print("Usuario globalmente baneado ("..msg.added.id..")", msg.added.first_name.."(@"..msg.added.username..")")
+      else
+      	print("Usuario globalmente baneado ("..msg.added.id..")", msg.added.first_name)
+      end
+     end
+  end
+  return var
+end
+
 -- Plugins
 function disable_plugin(msg, blocks)
 local var = false
