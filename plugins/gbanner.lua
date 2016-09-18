@@ -132,11 +132,11 @@ end
 return {
 	action = action,
 	triggers = {
-				'^/(gban)$',
-				'^/(gban) (%d+)$',
-				'^/(ungban)$',
-				'^/(ungban) (%d+)$',
-				'^/(isgban)$',
-				'^/(isgban) (%d+)$'
+				'^[/!](gban)$',
+				'^[/!](gban) (%d+)$',
+				'^[/!](ungban)$',
+				'^[/!](ungban) (%d+)$',
+				'^[/!](isgban)$',
+				'^[/!](isgban) (%d+)$'
 				}
 		}
