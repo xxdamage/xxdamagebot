@@ -25,6 +25,8 @@ function bot_init(on_reload) -- The function run when the bot is started or relo
 		print(clr.red..error)
 		return
 	end
+	print(clr.blue..'Leyendo gbans.lua...' ..clr.reset)
+	gbans = dofile('data/gbans.lua')
 	misc, roles = dofile('utilities.lua') -- Load miscellaneous and cross-plugin functions.
 	lang = dofile(config.languages) -- All the languages available
 	key = dofile("key.lua")
