@@ -10,7 +10,7 @@ if not(msg.chat.type == 'private') and not roles.is_admin(msg) then
 end
      action_sucess = api.banUser(msg.chat.id, msg.from.id)
      if action_sucess then
-     api.sendMessage(msg.chat.id, name.. ' ('..id.. ') ha sido *banead@* por hacer SPAM 🔨 Para conocer mas sobre el spam y los terminos, usa /spamhelp\n\n🔸 `Informe enviado al administrador` ', true)
+     api.sendKeyboard(msg.chat.id, name.. ' ('..id.. ') ha sido *banead@* por hacer SPAM 🔨\n\n🔸 `Informe enviado al administrador`', {inline_keyboard = {{{text = 'Desbanear', callback_data = 'unban:'..id}}}}, true))
      misc.forwardToAdmins(msg.chat.id, msg.message_id)
      misc.sendMessageToAdmins(msg.chat.id, '👆 SPAM en el grupo: ➡️ *'..msg.chat.title..'*')
         end
