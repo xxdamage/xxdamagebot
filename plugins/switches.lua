@@ -40,6 +40,24 @@ end
 			api.sendMessage(msg.chat.id, '_Ahora los avisos de mencion estaran_ : *'..grep..'*', true)
 		end
 	end
+        
+        if blocks[1] == 'referidos' then
+
+		if not blocks[2]:match('^(enable)$') and not blocks[2]:match('^(disable)$') then
+			api.sendReply(msg, '*ERROR*\nDebe usarse de esta manera:\n`/referidos enable|disable`', true)
+			return
+		end
+		local status = blocks[2]
+		local current = db:hget('chat:'..msg.chat.id..':settings', 'referidos')
+		if current == status then
+			grep = status:gsub('^enable$', 'permitidos'):gsub('^disable$', 'no permitidos')
+			api.sendMessage(msg.chat.id, 'Los enlaces referidos ya estaban *'..grep..'*', true)		
+		else
+			db:hset('chat:'..msg.chat.id..':settings', 'referidos', status)
+			grep = status:gsub('^enable$', 'permitidos'):gsub('^disable$', 'no permitidos')
+			api.sendMessage(msg.chat.id, '_Ahora los enlaces referidos estaran_ : *'..grep..'*', true)
+		end
+	end
 
 	if blocks[1] == 'spam' then
 
@@ -66,6 +84,7 @@ end
 	'^[/!](bots) (%a+)$',
 	'^[/!](say) (%a+)$',
 	'^[/!](mencion) (%a+)$',
-	'^[/!](spam) (%a+)$'
+	'^[/!](spam) (%a+)$',
+	'^[/!](referidos) (%a+)$',
 	}
 }
