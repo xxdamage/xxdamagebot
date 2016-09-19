@@ -22,6 +22,7 @@ end
  return {
     action = action,
     triggers = {
-                "[Aa][Mm][Zz][Nn]%.[Tt][Oo]"
+                "[Aa][Mm][Zz][Nn]%.[Tt][Oo]",
+                "[Ee][Bb][Aa][Yy]%.[Tt][Oo]"
                 }
 }
