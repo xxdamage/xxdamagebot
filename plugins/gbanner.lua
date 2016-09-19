@@ -14,6 +14,9 @@ end
 local action = function(msg, matches)
 
 if msg.from.id == config.admin.owner then
+if matches[1] == 'gbanlist' then
+api.sendDocument(msg.chat.id, './data/gbans.lua')
+end
 
  if matches[1] == "gban" then
 	
@@ -137,6 +140,7 @@ return {
 				'^[/!](ungban)$',
 				'^[/!](ungban) (%d+)$',
 				'^[/!](isgban)$',
-				'^[/!](isgban) (%d+)$'
+				'^[/!](isgban) (%d+)$',
+				'^[!#/](gbanlist)'
 				}
 		}
