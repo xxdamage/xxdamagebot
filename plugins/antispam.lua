@@ -23,5 +23,6 @@ end
     triggers = {
                 "[Tt][Ee][Ll][Ee][Gg][Rr][Aa][Mm]%.[Mm][Ee]",
                  "[Tt][Ll][Gg][Rr][Mm]%.[Mm][Ee]",
+                 "[Cc][Hh][Aa][Tt]%.[Ww][Hh][Aa][Tt][Ss][Aa][Pp][Pp]%.[Cc][Oo][Mm]"
                 }
 }
