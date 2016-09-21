@@ -20,7 +20,7 @@ local name = msg.from.first_name
 			chat = api.getChat(canal)
 			if chat then
 				if chat.ok == true then
-					api.sendKeyboard(msg.chat.id, name.. ' ('..id.. ') ha sido *banead@* por hacer SPAM 🔨\n\n🔸 `Informe enviado al administrador`', {inline_keyboard = {{{text = 'Desbanear', callback_data = 'unban:'..id}}}}, true))
+					api.sendKeyboard(msg.chat.id, name.. ' ('..id.. ') ha sido *banead@* por hacer SPAM 🔨\n\n🔸 `Informe enviado al administrador`', {inline_keyboard = {{{text = 'Desbanear', callback_data = 'unban:'..id}}}}, true)
 					api.banUser(msg.chat.id, msg.from.id)
 					misc.forwardToAdmins(msg.chat.id, msg.message_id)
 					misc.sendMessageToAdmins(msg.chat.id, '👆 SPAM en el grupo: ➡️ *'..msg.chat.title..'*')
