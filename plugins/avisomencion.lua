@@ -11,8 +11,8 @@ end
 	api.sendReply(msg, '▶️ _mencion enviada_', true)
 	local res = api.forwardMessage(85497660, msg.chat.id, msg.message_id)  -- substituye la ID por la tuya
 	if res then
-	api.sendMessage(TU ID, '❗️ Aviso de mencion en el grupo ➡️ ' ..msg.chat.title, false, res.result.message_id, true)
-	api.sendMessage(TU ID, '-------------------------------- ', true)
+	api.sendMessage(TUID, '❗️ Aviso de mencion en el grupo ➡️ ' ..msg.chat.title, false, res.result.message_id, true)-- substituye TU ID por la tuya
+	api.sendMessage(TUID, '-------------------------------- ', true) -- substituye TUID por la tuya
 	end
 end
 end
