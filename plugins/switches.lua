@@ -2,8 +2,7 @@
 
 local action = function(msg, blocks, ln)
 
-if not (msg.chat.type == 'private') and roles.is_admin(msg) then
-end
+if roles.is_admin(msg) then
 
 	if blocks[1] == 'bots' then
 
@@ -74,6 +73,7 @@ end
 			db:hset('chat:'..msg.chat.id..':settings', 'spam', status)
 			grep = status:gsub('^enable$', 'permitido'):gsub('^disable$', 'no permitido')
 			api.sendMessage(msg.chat.id, '_Ahora el spam estará_ : *'..grep..'*', true)
+			end
 		end
 	end
 end
