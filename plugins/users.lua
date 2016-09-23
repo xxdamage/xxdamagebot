@@ -10,6 +10,42 @@ local function do_keybaord_credits()
 	return keyboard
 end
 
+local function res_usuario(msg, blocks)
+	local dec = msg:gsub(' ', ''):gsub('\t', ''):gsub('\n', '')
+	local url = 'https://api.pwrtelegram.xyz/bot'..config.bot_api_key..'/getChat?chat_id='..dec
+--	local url2 = 'https://api.telegram.org/bot' .. config.bot_api_key..'/getChat?chat_id='..dec
+	local dat = HTTPS.request(url)	
+	local res = JSON.decode(dat)
+	if not res.ok or not res then
+			return '**No encontrado**'
+	end
+	if res.result.last_name and res.result.username then
+	   return 'ID: '..res.result.id
+	   ..'\nNombre: ' ..res.result.first_name
+	   ..'\nApellido: ' ..res.result.last_name
+	   ..'\nAlias: @' ..res.result.username
+	end
+	if not res.result.last_name and res.result.username and not res.result.title then
+	   return 'ID: '..res.result.id
+	   ..'\nNombre: ' ..res.result.first_name
+	   ..'\nAlias: @' ..res.result.username
+	end
+	if not res.result.last_name and not res.result.username and not res.result.title then
+	   return 'ID: '..res.result.id
+	   ..'\nNombre: ' ..res.result.first_name
+	end
+	if res.result.last_name and not res.result.username then
+	   return 'ID: '..res.result.id
+	   ..'\nNombre: ' ..res.result.first_name
+	   ..'\nApellido: ' ..res.result.last_name
+	end
+	if res.result.title and res.result.username then
+	   return 'Chat ID: '..res.result.id
+	   ..'\nTítulo: ' ..res.result.title
+	   ..'\nAlias: @' ..res.result.username
+	end
+end
+
 local function do_keyboard_cache(chat_id)
 	local keyboard = {inline_keyboard = {{{text = '🔄️ Refresh cache', callback_data = 'cc:rel:'..chat_id}}}}
 	return keyboard
@@ -103,8 +139,12 @@ end
 local function do_keyboard_userinfo(user_id, ln)
 	local keyboard = {
 		inline_keyboard = {
-			{{text = lang[ln].userinfo.remwarns_kb, callback_data = 'userbutton:remwarns:'..user_id}},
+			{{text ='‼ '..lang[ln].userinfo.remwarns_kb..'', callback_data = 'userbutton:remwarns:'..user_id}},
+			{{text ='🔠 Resolver Usuario', callback_data = 'userbutton:resolver:'..user_id}},
 			{{text ='🔨 Ban', callback_data = 'userbutton:banuser:'..user_id}},
+			{{text ='✅ UnBan', callback_data = 'userbutton:unbanuser:'..user_id}},
+			{{text ='🔨 Global Ban', callback_data = 'userbutton:gbanuser:'..user_id}},
+			{{text ='✅ Global UnBan', callback_data = 'userbutton:ungbanuser:'..user_id}},
 		}
 	}
 	
@@ -115,7 +155,7 @@ local function get_userinfo(user_id, chat_id, ln)
 	return lang[ln].userinfo.header_1..get_ban_info(user_id, chat_id, ln)
 end
 
-local action = function(msg, blocks)
+local action = function(msg, blocks, matches)
     if blocks[1] == 'adminlist' then
     	if msg.chat.type == 'private' then return end
     	local out
@@ -255,6 +295,71 @@ local action = function(msg, blocks)
 		end
 		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
 	end
+	if blocks[1] == 'unbanuser' then
+		if not roles.is_admin_cached(msg) then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+    		return
+		end
+		
+		local user_id = msg.target_id
+		
+		local res, text = api.unbanUser(msg.chat.id, user_id, msg.normal_group, msg.ln)
+		if res then
+			local name = misc.getname_link(msg.from.first_name, msg.from.username) or msg.from.first_name:mEscape()
+			text = lang[msg.ln].getban.unbanned..'\n(Admin: '..name..')'
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
+	if blocks[1] == 'gbanuser' then
+		local dev = msg.from.id == config.admin.owner
+if not dev then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_dev:mEscape_hard())
+    		return
+		end
+		
+		local user_id = msg.target_id
+		local text, chat_id = lang[msg.ln].getban.gbanned..'\n`(Desarrollador: '..msg.from.first_name:mEscape()..')`'
+		
+		local res = os.execute('perl -pi -e "s[gbans = \\{][gbans = {\n\t'..user_id..',]g" data/gbans.lua')
+		local action_sucess = api.kickUser(msg.chat.id, user_id)
+		if res and action_sucess and text then
+			misc.saveBan(user_id, 'ban')
+			bot_init(true)
+			end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
+	if blocks[1] == 'ungbanuser' then
+		local dev = msg.from.id == config.admin.owner
+if not dev then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_dev:mEscape_hard())
+    		return
+		end
+		
+		local user_id = msg.target_id
+		local text, chat_id = lang[msg.ln].getban.ungbanned..'\n`(Desarrollador: '..msg.from.first_name:mEscape()..')`'
+		
+		local res = os.execute('sed -i "/' ..user_id.. '/d" ./data/gbans.lua')
+		local action_sucess = api.unbanUser(msg.chat.id, user_id, msg.normal_group, msg.ln)
+		if res and action_sucess then
+		bot_init(true)
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
+	if blocks[1] == 'resolver' then
+		if not roles.is_admin_cached(msg) then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+    		return
+		end
+		local resolver = res_usuario(blocks[2], msg.chat.id)
+--		local resolve = res_user_group(blocks[2], msg.chat.id)
+		if not resolver then
+			message = lang[ln].bonus.no_user
+		else
+			message = '*'..resolver..'*'
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, message, false, true)
+--		api.sendMessage(msg.chat.id, message, true)
+	end
 	if blocks[1] == 'remwarns' then
 		if not roles.is_admin_cached(msg) then
     		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
@@ -321,8 +426,14 @@ return {
 		config.cmd..'(user)$',
 		config.cmd..'(user) (.*)',
 		
+		'^###cb:userbutton:(gbanuser):(%d+)$',
 		'^###cb:userbutton:(banuser):(%d+)$',
+		'^###cb:userbutton:(ungbanuser):(%d+)$',
+		'^###cb:userbutton:(unbanuser):(%d+)$',
+		'^###cb:userbutton:(resolver):(%d+)$',
 		'^###cb:userbutton:(remwarns):(%d+)$',
 		'^###cb:(cc:rel):'
 	}
 }
+
+-- gracias a webrom por la ayuda
