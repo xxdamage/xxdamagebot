@@ -36,7 +36,9 @@ return {
             arab = 'Removed for arab chars: ',
             rtl = 'Removed for RTL char: ',
             kicked = '_Kicked!_',
-            banned = '_Banned!_'
+            banned = '_Banned!_',
+            gbanned = '_Globally Banned!_',
+            ungbanned = '_Globally Unbanned!_'
         },
         bonus = {
             general_pm = '_I\'ve sent you the message in private_',
@@ -51,6 +53,7 @@ return {
             menu_cb_warns = 'Use the row below to change the warns settings!',
         },
         not_mod = 'You are *not* an admin',
+        not_dev = 'You are *not* an developer',
         breaks_markdown = 'This text breaks the markdown.\nMore info about a proper use of markdown [here](https://telegram.me/GroupButler_ch/46).',
         credits = '*Some useful links:*',
         extra = {
@@ -795,7 +798,10 @@ funziono meglio se mi aggiungi agli amministratori del gruppo (altrimenti non po
             arab = 'Eliminado por caracteres árabes: ',
             rtl = 'Eliminado por caracter RTL: ',
             kicked = '_¡Expulsado!_',
-            banned = '_¡Baneado!_'
+            banned = '_¡Baneado!_',
+            unbanned = '_¡Desbaneado!_',
+            gbanned = '_¡Baneado Globalmente!_',
+            ungbanned = '_¡Desbaneado Globalmente!_'
         },
         userinfo = {
             header_1 = '*Información del ban (globales)*:\n',
@@ -816,6 +822,7 @@ funziono meglio se mi aggiungi agli amministratori del gruppo (altrimenti non po
             menu_cb_warns = 'Usa la fila de debajo para cambiar los ajustes de advertencias',
         },
         not_mod = 'Tu *no* eres admin',
+        not_dev = 'Tu *no* eres desarrollador',
         breaks_markdown = 'Este texto no puede ser reducido.\nMás información sobre un uso adecuado [aquí](https://telegram.me/GroupButler_ch/46).',
         credits = '*Algunos enlaces de interés:*',
         extra = {
@@ -3586,7 +3593,7 @@ The inline keyboard has three sub-menus:
             },
             welcome = {
                 custom_setted = "已更新歡迎訊息。",
-                media_setted = "新媒體被設定成歡迎訊息︰",
+                media_setted = "新媒���被設定成歡迎訊息︰",
                 no_input = "歡迎然後……？",
                 reply_media = "對 Gif 或貼圖回覆，將它設定成歡迎訊息",
                 wrong_markdown = "〝未能設定︰我不能向你傳送此訊息，可能是字型符號出錯\n請檢查訊息內容"
