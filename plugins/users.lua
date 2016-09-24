@@ -140,18 +140,16 @@ local function do_keyboard_userinfo(user_id, ln)
   local keyboard = {
     inline_keyboard = {
          {
-        {text ='‼️ '..lang[ln].userinfo.remwarns_kb..'', callback_data = 'userbutton:remwarns:'..user_id},
-          {text ='🔠 Resolver Usuario', callback_data = 'userbutton:resolver:'..user_id}
-       },
-         {
         {text ='🔨 Ban', callback_data = 'userbutton:banuser:'..user_id},
           {text ='✅ UnBan', callback_data = 'userbutton:unbanuser:'..user_id}
        },
     
          {
-        {text ='🔨 Global Ban', callback_data = 'userbutton:gbanuser:'..user_id},
+        {text ='🔥 Global Ban', callback_data = 'userbutton:gbanuser:'..user_id},
           {text ='✅ Global UnBan', callback_data = 'userbutton:ungbanuser:'..user_id}
        },
+        {{text ='‼️ '..lang[ln].userinfo.remwarns_kb..'', callback_data = 'userbutton:remwarns:'..user_id}},
+      {{text ='🔠 Resolver Usuario', callback_data = 'userbutton:resolver:'..user_id}},
       }
   }
   
