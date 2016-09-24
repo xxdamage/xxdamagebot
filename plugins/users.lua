@@ -143,6 +143,11 @@ local function do_keyboard_userinfo(user_id, ln)
         {text ='🔨 Ban', callback_data = 'userbutton:banuser:'..user_id},
           {text ='✅ UnBan', callback_data = 'userbutton:unbanuser:'..user_id}
        },
+
+       {
+        {text ='🔒 Block', callback_data = 'userbutton:blockuser:'..user_id},
+          {text ='🔓 UnBlock', callback_data = 'userbutton:unblockuser:'..user_id}
+       },
     
          {
         {text ='🔥 Global Ban', callback_data = 'userbutton:gbanuser:'..user_id},
@@ -155,6 +160,7 @@ local function do_keyboard_userinfo(user_id, ln)
   
   return keyboard
 end
+
 
 local function get_userinfo(user_id, chat_id, ln)
 	return lang[ln].userinfo.header_1..get_ban_info(user_id, chat_id, ln)
@@ -350,6 +356,58 @@ if not dev then
 		end
 		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
 	end
+	if blocks[1] == 'blockuser' then
+		if not roles.is_admin_cached(msg) then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+    		return
+		end
+		local id
+		if not blocks[2] then
+			if not msg.reply then
+				api.sendReply(msg, 'Este comando necesita respuesta o alias')
+				return
+			else
+				id = msg.reply.from.id
+			end
+		else
+			id = blocks[2]
+		end
+		local response = db:sadd('bot:blocked', id)
+		local text
+		if response == 1 then
+			text = id..' ha sido bloqueado, no podra interactuar con el bot'
+		else
+			text = id..' ya estaba bloqueado'
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
+	if blocks[1] == 'unblockuser' then
+		if not roles.is_admin_cached(msg) then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+    		return
+		end
+		local id
+		local response
+		if not blocks[2] then
+			if not msg.reply then
+				api.sendReply(msg, 'This command need a reply')
+				return
+			else
+				id = msg.reply.from.id
+			end
+		else
+			id = blocks[2]
+		end
+		local response = db:srem('bot:blocked', id)
+		local text
+		if response == 1 then
+			text = id..' ha sido desbloqueado, ahora podra interactuar con el bot'
+		else
+			text = id..' ya estaba bloqueado'
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
+
 	if blocks[1] == 'resolver' then
 		if not roles.is_admin_cached(msg) then
     		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
@@ -427,10 +485,10 @@ return {
 		config.cmd..'(welcome)$',
 		config.cmd..'(cache)$',
 		config.cmd..'(msglink)$',
-		
 		config.cmd..'(user)$',
-		config.cmd..'(user) (.*)',
-		
+		config.cmd..'(user) (.*)',	
+		'^###cb:userbutton:(blockuser):(%d+)$',
+	    '^###cb:userbutton:(unblockuser):(%d+)$',	
 		'^###cb:userbutton:(gbanuser):(%d+)$',
 		'^###cb:userbutton:(banuser):(%d+)$',
 		'^###cb:userbutton:(ungbanuser):(%d+)$',
@@ -440,5 +498,3 @@ return {
 		'^###cb:(cc:rel):'
 	}
 }
-
--- gracias a webrom por la ayuda
