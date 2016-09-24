@@ -10,6 +10,28 @@ local function do_keybaord_credits()
 	return keyboard
 end
 
+local function get_nick(msg, blocks)
+	local admin, target
+	--admin
+	if msg.from.username then
+		admin = misc.getname_link(msg.from.first_name, msg.from.username)
+	else
+		admin = msg.from.first_name:mEscape()
+	end
+	--target
+	if msg.reply then --kick/ban the replied user
+		if msg.reply.from.username then
+			target = misc.getname_link(msg.reply.from.first_name, msg.reply.from.username)
+		else
+			target = msg.reply.from.first_name:mEscape()
+		end
+	elseif blocks then
+		target = misc.getname_link(blocks[2]:gsub('@', ''), blocks[2])
+	end
+	return admin, target
+end
+
+
 local function res_usuario(msg, blocks)
 	local dec = msg:gsub(' ', ''):gsub('\t', ''):gsub('\n', '')
 	local url = 'https://api.pwrtelegram.xyz/bot'..config.bot_api_key..'/getChat?chat_id='..dec
@@ -143,6 +165,8 @@ local function do_keyboard_userinfo(user_id, ln)
         {text ='🔨 Ban', callback_data = 'userbutton:banuser:'..user_id},
           {text ='✅ UnBan', callback_data = 'userbutton:unbanuser:'..user_id}
        },
+
+       {{text ='🚪 Kick (puede entrar de nuevo)', callback_data = 'userbutton:kickuser:'..user_id}},
 
        {
         {text ='🔒 Block', callback_data = 'userbutton:blockuser:'..user_id},
@@ -423,6 +447,21 @@ if not dev then
 		api.editMessageText(msg.chat.id, msg.message_id, message, false, true)
 --		api.sendMessage(msg.chat.id, message, true)
 	end
+	if blocks[1] == 'kickuser' then
+		    	if not roles.is_admin_cached(msg) then
+    		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+    		return
+		end
+		
+		local user_id = msg.target_id
+		
+		local res, text = api.kickUser(msg.chat.id, user_id, msg.normal_group, msg.ln)
+		if res then
+			local name = misc.getname_link(msg.from.first_name, msg.from.username) or msg.from.first_name:mEscape()
+			text = 'Expulsado\n(Admin: '..name..')'
+		end
+		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+	end
 	if blocks[1] == 'remwarns' then
 		if not roles.is_admin_cached(msg) then
     		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
@@ -486,7 +525,8 @@ return {
 		config.cmd..'(cache)$',
 		config.cmd..'(msglink)$',
 		config.cmd..'(user)$',
-		config.cmd..'(user) (.*)',	
+		config.cmd..'(user) (.*)',
+		'^###cb:userbutton:(kickuser):(%d+)$',
 		'^###cb:userbutton:(blockuser):(%d+)$',
 	    '^###cb:userbutton:(unblockuser):(%d+)$',	
 		'^###cb:userbutton:(gbanuser):(%d+)$',
