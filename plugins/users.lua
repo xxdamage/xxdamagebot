@@ -436,7 +436,7 @@ if not dev then
 		local res, text = api.kickUser(msg.chat.id, user_id, msg.normal_group, msg.ln)
 		if res then
 			local name = misc.getname_link(msg.from.first_name, msg.from.username) or msg.from.first_name:mEscape()
-			text = 'Expulsado\n(Admin: '..name..')'
+			text = 'Expulsado (puede entrar de nuevo)\n(Admin: '..name..')'
 		end
 		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
 	end
