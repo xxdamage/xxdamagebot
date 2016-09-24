@@ -10,28 +10,6 @@ local function do_keybaord_credits()
 	return keyboard
 end
 
-local function get_nick(msg, blocks)
-	local admin, target
-	--admin
-	if msg.from.username then
-		admin = misc.getname_link(msg.from.first_name, msg.from.username)
-	else
-		admin = msg.from.first_name:mEscape()
-	end
-	--target
-	if msg.reply then --kick/ban the replied user
-		if msg.reply.from.username then
-			target = misc.getname_link(msg.reply.from.first_name, msg.reply.from.username)
-		else
-			target = msg.reply.from.first_name:mEscape()
-		end
-	elseif blocks then
-		target = misc.getname_link(blocks[2]:gsub('@', ''), blocks[2])
-	end
-	return admin, target
-end
-
-
 local function res_usuario(msg, blocks)
 	local dec = msg:gsub(' ', ''):gsub('\t', ''):gsub('\n', '')
 	local url = 'https://api.pwrtelegram.xyz/bot'..config.bot_api_key..'/getChat?chat_id='..dec
