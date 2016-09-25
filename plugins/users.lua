@@ -10,6 +10,17 @@ local function do_keybaord_credits()
 	return keyboard
 end
 
+local function doKeyboard_warn(user_id)
+	local keyboard = {}
+    keyboard.inline_keyboard = {
+    	{
+    		{text = 'Resetear avisos', callback_data = 'resetwarns:'..user_id},
+    		{text = 'Eliminar este aviso', callback_data = 'removewarn:'..user_id}
+    	}
+    }
+    return keyboard
+end
+
 local function res_usuario(msg, blocks)
 	local dec = msg:gsub(' ', ''):gsub('\t', ''):gsub('\n', '')
 	local url = 'https://api.pwrtelegram.xyz/bot'..config.bot_api_key..'/getChat?chat_id='..dec
@@ -155,8 +166,9 @@ local function do_keyboard_userinfo(user_id, ln)
         {text ='🔥 Global Ban', callback_data = 'userbutton:gbanuser:'..user_id},
           {text ='✅ Global UnBan', callback_data = 'userbutton:ungbanuser:'..user_id}
        },
+       {{text ='⚠️ Advertir', callback_data = 'userbutton:warnuser:'..user_id}},
         {{text ='‼️ '..lang[ln].userinfo.remwarns_kb..'', callback_data = 'userbutton:remwarns:'..user_id}},
-      {{text ='🔠 Resolver Usuario', callback_data = 'userbutton:resolver:'..user_id}},
+      {{text ='🔠 Info Usuario', callback_data = 'userbutton:resolver:'..user_id}},
       }
   }
   
@@ -410,6 +422,57 @@ if not dev then
 		api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
 	end
 
+	if blocks[1] == 'warnuser' then
+  if not roles.is_admin_cached(msg) then
+      api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
+      return
+  end     
+     local user_id = msg.target_id
+     local name = get_user_id(msg, blocks)
+  local hash = 'chat:'..msg.chat.id..':warns'
+  local num = db:hincrby(hash, user_id, 1) --add one warn
+  local nmax = (db:hget('chat:'..msg.chat.id..':warnsettings', 'max')) or 3 --get the max num of warnings
+  local text, res, motivation
+  
+  if tonumber(num) >= tonumber(nmax) then
+   local type = (db:hget('chat:'..msg.chat.id..':warnsettings', 'type')) or 'kick'
+   --try to kick/ban
+   if type == 'ban' then
+    text = make_text(lang[msg.ln].warn.warned_max_ban, name:mEscape())..' ('..num..'/'..nmax..')'
+    local is_normal_group = false
+       if msg.chat.type == 'group' then is_normal_group = true end
+    res, motivation = api.banUser(msg.chat.id, user_id, is_normal_group, ln)
+      else --kick
+    text = make_text(lang[ln].warn.warned_max_kick, name:mEscape())..' ('..num..'/'..nmax..')'
+       res, motivation = api.kickUser(msg.chat.id, user_id, ln)
+      end
+      --if kick/ban fails, send the motivation
+      if not res then
+       if not motivation then
+        motivation = lang[ln].banhammer.general_motivation
+       end
+       text = motivation
+      else
+       misc.saveBan(user_id, 'warn') --add ban
+		if type == 'ban' then --add to the banlist
+        local why = lang[msg.ln].warn.ban_motivation
+        if blocks[2] then why = blocks[2] end
+        misc.remGroup(msg.chat.id, user_id, name, why)
+       end
+       db:hdel('chat:'..msg.chat.id..':warns', user_id) --if kick/ban works, remove the warns
+       db:hdel('chat:'..msg.chat.id..':mediawarn', user_id)
+      end
+      api.sendReply(msg, text, true) --if the user reached the max num of warns, kick and send message
+  else
+   local diff = tonumber(nmax)-tonumber(num)
+   text = make_text(lang[msg.ln].warn.warned, name:mEscape(), num, nmax)
+   local keyboard = doKeyboard_warn(user_id)
+   api.sendKeyboard(msg.chat.id, text, keyboard, true, msg.message_id) --if the user is under the max num of warnings, send the inline keyboard
+  end
+  text = 'Usuario advertido \n`(Admin: '..msg.from.first_name:mEscape()..')`'
+  api.editMessageText(msg.chat.id, msg.message_id, text, false, true)
+    end
+
 	if blocks[1] == 'resolver' then
 		if not roles.is_admin_cached(msg) then
     		api.answerCallbackQuery(msg.cb_id, lang[msg.ln].not_mod:mEscape_hard())
@@ -504,6 +567,7 @@ return {
 		config.cmd..'(msglink)$',
 		config.cmd..'(user)$',
 		config.cmd..'(user) (.*)',
+		'^###cb:userbutton:(warnuser):(%d+)$',
 		'^###cb:userbutton:(kickuser):(%d+)$',
 		'^###cb:userbutton:(blockuser):(%d+)$',
 	    '^###cb:userbutton:(unblockuser):(%d+)$',	
