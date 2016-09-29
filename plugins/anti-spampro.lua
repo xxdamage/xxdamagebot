@@ -40,7 +40,7 @@ local action = function(msg, blocks)
 				end
 			end
 			db:hset('chat:'..msg.chat.id..':settings', 'listablanca', canales)
-			api.sendReply(msg, "✅ Lista seteada correctamente. Esos alias seran ignorados por el antiflood")
+			api.sendReply(msg, "✅ Lista seteada correctamente. Esos alias seran ignorados por el antispam")
 			return true
 		end
 
