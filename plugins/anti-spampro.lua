@@ -93,7 +93,7 @@ local action = function(msg, blocks)
 				api.sendReply(msg, "ℹ️ No hay ningun canal en la lista blanca")
 				return false
 			else
-				api.sendReply(msg, "✅ Lista de canales permitidos:\n"..canales)
+				api.sendReply(msg, "✅ Lista de canales permitidos:\n"..string.gsub(trim(string.gsub(canales, ",", " ")), " ", ", "))
 				return true
 			end
 		end
