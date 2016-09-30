@@ -18,58 +18,103 @@ function trim(s)
   return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-local function n2s(s)
+function n2s(s)
 	if s == nil then return "" else return s end
 end
+
+
 
 local action = function(msg, blocks)
 	local id = msg.from.id
 	local name = msg.from.first_name
 
 	if blocks[1] == "lb" and roles.is_admin(msg) and #blocks >= 2 then
-		if blocks[2] == "set" then
-			if (#msg.entities == 1 and msg.entities[1].offset == 0) or (#msg.entities == 0) then
-				api.sendMessage(msg.chat.id, "Introduce una lista de canales a permitir")
+		--set y add
+		if blocks[2] == "set" or blocks[2] == "add" then
+			if (not msg.entities) or (#msg.entities == 1 and msg.entities[1].offset == 0) or (#msg.entities == 0) then
+				api.sendMessage(msg.chat.id, "ℹ️ Introduce una lista de canales a permitir en este grupo")
 				return false
 			end
-			canales=""
+			if blocks[2] == "set" then
+				canales = ""
+			else
+				canales = n2s(db:hget('chat:'..msg.chat.id..':settings', 'listablanca'))
+			end
+			nocanal={}
+			repes={}
+			modified=false
 			for i,entity in pairs(msg.entities) do
 				canal = trim(string.sub(msg.text, entity.offset+1, entity.offset+entity.length+1))
 				if canal ~= "/"..blocks[1] then
-					canales = canales..","..canal
+					if api.getChat(canal) then
+						if string.match(canales, canal) == nil then
+							canales = canales..","..canal
+							modified=true
+						else
+							repes[#repes+1]=canal
+						end
+					else
+						nocanal[#nocanal+1]=canal
+					end
 				end
 			end
 			db:hset('chat:'..msg.chat.id..':settings', 'listablanca', canales)
-			api.sendReply(msg, "✅ Lista seteada correctamente. Esos alias seran ignorados por el antispam")
+			if modified then
+				if blocks[2] == "set" then
+					message="✅ Lista seteada correctamente. Esos alias seran ignorados por el antispam en este grupo."
+				else
+					message="✅ Añadidas excepciones correctamente. Esos alias seran ignorados por el antispam en este grupo."
+				end
+			else
+				message=""
+			end
+			if #nocanal > 0 then
+				message = message.."\n\n"
+				for i,canal in pairs(nocanal) do
+					if i == 1 then
+						message=message..canal
+					elseif i == #nocanal then
+						message=message.." y "..canal
+					else
+						message=message..", "..canal
+					end
+				end
+				if #nocanal == 1 then
+					message=message.." no es un canal válido, no se añadirá a la lista."
+				else
+					message=message.." no son canales válidos, no se añadirán a la lista."
+				end
+			end
+			if #repes > 0 then
+				message = message.."\n\n"
+				for i,canal in pairs(repes) do
+					if i == 1 then
+						message=message..canal
+					elseif i == #repes then
+						message=message.." y "..canal
+					else
+						message=message..", "..canal
+					end
+				end
+				if #repes == 1 then
+					message=message.." está repetido, no se añadirá a la lista."
+				else
+					message=message.." están repetidos, no se añadirán a la lista."
+				end
+			end
+			api.sendReply(msg, message)
 			return true
 		end
-
+		--reset
 		if blocks[2] == "reset" then
 			db:hdel('chat:'..msg.chat.id..':settings', 'listablanca')
-			api.sendReply(msg, "🔁 Lista blanca reseteada")
+			api.sendReply(msg, "🔁 Lista blanca de antispam reseteada para este grupo")
 			return true
 		end
-
-		if blocks[2] == "add" then
-			if (#msg.entities == 1 and msg.entities[1].offset == 0) or (#msg.entities == 0) then
-				api.sendMessage(msg.chat.id, "ℹ️ Introduce una lista de canales a añadir")
-				return false
-			end
-			canales = n2s(db:hget('chat:'..msg.chat.id..':settings', 'listablanca'))
-			for i,entity in pairs(msg.entities) do
-				canal = trim(string.sub(msg.text, entity.offset+1, entity.offset+entity.length+1))
-				if canal ~= "/"..blocks[1] then
-					canales = canales..","..canal
-				end
-			end
-			db:hset('chat:'..msg.chat.id..':settings', 'listablanca', canales)
-			api.sendReply(msg, "🆕 Canal/es añadido/s a la lista blanca. Ahora esos alias seran ignorados por el antispam")
-			return true
-		end
-
+		--del
 		if blocks[2] == "del" then
-			if (#msg.entities == 1 and msg.entities[1].offset == 0) or (#msg.entities == 0) then
-				api.sendMessage(msg.chat.id, "ℹ️ Introduce una lista de canales a eliminar")
+			if (not msg.entities) or (#msg.entities == 1 and msg.entities[1].offset == 0) or (#msg.entities == 0) then
+				api.sendMessage(msg.chat.id, "ℹ️ Introduce una lista de canales a eliminar en este grupo")
 				return false
 			end
 			canales = db:hget('chat:'..msg.chat.id..':settings', 'listablanca')
@@ -83,17 +128,17 @@ local action = function(msg, blocks)
 				canales = string.gsub(canales, ","..canal, "")
 			end
 			db:hset('chat:'..msg.chat.id..':settings', 'listablanca', canales)
-			api.sendReply(msg, "🔁 Canal/es eliminado/s de la lista blanca")
+			api.sendReply(msg, "🔁 Canal/es eliminado/s de la lista blanca de este grupo")
 			return true
 		end
-
+		--show
 		if blocks[2] == "show" then
 			canales = db:hget('chat:'..msg.chat.id..':settings', 'listablanca')
 			if canales == nil or canales == "" then
 				api.sendReply(msg, "ℹ️ No hay ningun canal en la lista blanca")
 				return false
 			else
-				api.sendReply(msg, "✅ Lista de canales permitidos:\n"..string.gsub(trim(string.gsub(canales, ",", " ")), " ", ", "))
+				api.sendReply(msg, "✅ Lista de canales permitidos en este grupo:\n"..string.gsub(trim(string.gsub(canales, ",", " ")), " ", ", ").." y por último, pero no por ello menos importante: @APirateK")
 				return true
 			end
 		end
