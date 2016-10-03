@@ -32,6 +32,7 @@ return {
 		'onmessage.lua', --THIS MUST BE THE FIRST: IF AN USER IS SPAMMING/IS BLOCKED, THE BOT WON'T GO THROUGH PLUGINS
 		'configure.lua',
 		'referidos.lua',
+		'pin.lua',
 		'gbanner.lua',
 		'fortune.lua',
         	'ban2.lua',
