@@ -27,6 +27,12 @@ get_coords = function(input)
 
 end
 
+--pin
+
+function misc.deeplink_constructor(chat_id, what)
+	return 'telegram.me/'..bot.username..'?start='..chat_id..':'..what
+end
+
 --GBAN
 
 function user_gbanned(msg)
