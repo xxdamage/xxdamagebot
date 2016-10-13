@@ -184,7 +184,7 @@ Recuerda tener el antispam activado con el comando !spam disable para que esto f
 		for _,entity in pairs(msg.entities) do
 			canal = trim(string.sub(msg.text, entity.offset+1, entity.offset+entity.length+1))
 			for _,alias in pairs(listablanca) do
-				if canal:lower() == alias then goto continue end
+				if canal:lower() == alias:lower() then goto continue end
 			end
 
 			chat = api.getChat(canal)
