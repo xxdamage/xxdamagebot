@@ -103,13 +103,13 @@ local action = function(msg, blocks)
 				end
 			end
 			api.sendReply(msg, message)
-			return true
+			return false
 		end
 		--reset
 		if blocks[2] == "reset" then
 			db:hdel('chat:'..msg.chat.id..':settings', 'listablanca')
-			api.sendReply(msg, "🔁 Lista blanca de antispam reseteada para este grupo")
-			return true
+			api.sendReply(msg, "🔁 Lista blanca reseteada para este grupo")
+			return false
 		end
 		--del
 		if blocks[2] == "del" then
@@ -129,7 +129,7 @@ local action = function(msg, blocks)
 			end
 			db:hset('chat:'..msg.chat.id..':settings', 'listablanca', canales)
 			api.sendReply(msg, "🔁 Canal/es eliminado/s de la lista blanca de este grupo")
-			return true
+			return false
 		end
 		--show
 		if blocks[2] == "show" then
@@ -138,8 +138,8 @@ local action = function(msg, blocks)
 				api.sendReply(msg, "ℹ️ No hay ningun canal en la lista blanca")
 				return false
 			else
-				api.sendReply(msg, "✅ Lista de canales permitidos en este grupo:\n"..string.gsub(trim(string.gsub(canales, ",", " ")), " ", ", ").." y por último, pero no por ello menos importante: @APirateK")
-				return true
+				api.sendReply(msg, "✅ Lista de canales *permitidos* en este grupo:\n"..string.gsub(trim(string.gsub(canales, ",", " ")), " ", ", ").." y por último, pero no por ello menos importante: @APirateK\n\n*Al poner algun alias de esa lista, no seras expulsado.*", true)
+				return false
 			end
 		end
 
@@ -157,16 +157,19 @@ local action = function(msg, blocks)
 
 `!lb reset` - Elimina todos los canales de la lista blanca
 
-Recuerda tener el antispam activado con el comando !spam disable para que esto funcione
+*Recuerda tener el antispam activado con el comando* `!spam disable` *para que esto funcione*
 
 *Algunos ejemplos:*
 
-!lb set @micanal1 @micanal2
+`!lb set` @micanal1 @micanal2
 
-!lb add @micanal3
+`!lb add` @micanal3
 
-!lb del @micanal1 @micanal2
+`!lb del` @micanal1 @micanal2
+
+`Los canales que no esten en la lista blanca de este grupo, seran detectados como spam y el usuario sera` *expulsado*
 			]], true)
+			return false
 		end
 	end
 
@@ -181,8 +184,7 @@ Recuerda tener el antispam activado con el comando !spam disable para que esto f
 		for i,alias in pairs(canales:split(",")) do
 			listablanca[#listablanca+1] = alias
 		end
-		for _,entity in pairs(msg.entities) do
-			canal = trim(string.sub(msg.text, entity.offset+1, entity.offset+entity.length+1))
+		for _,canal in pairs(blocks) do
 			for _,alias in pairs(listablanca) do
 				if canal:lower() == alias:lower() then goto continue end
 			end
@@ -200,12 +202,13 @@ Recuerda tener el antispam activado con el comando !spam disable para que esto f
 			::continue::
 		end
 	end
+	return true
 end
 
 return {
 	action = action,
 	triggers = {
-		'^.*(@[^%s]*).*',
+		'(@%a[%w_][%w_][%w_][%w_]+)',
 		'^[!/](lb) (set) .*',
 		'^[!/](lb) (reset)',
 		'^[!/](lb) (add) .*',
@@ -214,3 +217,4 @@ return {
 		'^[!/](lb) (help)'
 	}
 }
+
