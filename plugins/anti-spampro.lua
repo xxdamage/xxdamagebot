@@ -22,8 +22,6 @@ function n2s(s)
 	if s == nil then return "" else return s end
 end
 
-
-
 local action = function(msg, blocks)
 	local id = msg.from.id
 	local name = msg.from.first_name
@@ -173,9 +171,7 @@ local action = function(msg, blocks)
 		end
 	end
 
-
 	if msg.chat.type == 'private' or roles.is_admin(msg) then return true end
-	if not msg.entities then return true end
 
 	if db:hget('chat:'..msg.chat.id..':settings', 'spam') == 'disable' then
 		canales = db:hget('chat:'..msg.chat.id..':settings', 'listablanca')
@@ -208,7 +204,7 @@ end
 return {
 	action = action,
 	triggers = {
-		'(@%a[%w_][%w_][%w_][%w_]+)',
+		{'(@%a[%w_][%w_][%w_][%w_]+)'},
 		'^[!/](lb) (set) .*',
 		'^[!/](lb) (reset)',
 		'^[!/](lb) (add) .*',
@@ -217,4 +213,5 @@ return {
 		'^[!/](lb) (help)'
 	}
 }
+
 
