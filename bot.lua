@@ -140,10 +140,21 @@ local function match_pattern(pattern, text)
   	if text then
   		text = text:gsub('@'..bot.username, '')
     	local matches = {}
-    	matches = { string.match(text, pattern) }
-    	if next(matches) then
-    		return matches
-		end
+    	if pattern[1] then
+    		for match in string.gmatch(text, pattern[1]) do
+    			if match ~= "" or match ~= nil then
+    				matches[#matches+1] = match
+    			end
+    		end
+    		if next(matches) then
+    			return matches
+    		end
+    	else
+    		matches = { string.match(text, pattern) }
+    		if next(matches) then
+    			return matches
+			end
+    	end
   	end
 end
 
@@ -184,6 +195,7 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 			if (config.bot_settings.testing_mode and plugin.test) or not plugin.test then --run test plugins only if test mode is on
 				for k,w in pairs(plugin.triggers) do
 					local blocks = match_pattern(w, msg.text)
+					if w[1] then w = w[1] end
 					if blocks then
 						
 						--workaround for the stupid bug
