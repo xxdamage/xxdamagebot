@@ -355,6 +355,14 @@ local function tomar_inline(msg)
 	end
 end
 
+local function tomar_msg_canales(msg)
+	if msg.channel_post then
+		msg.channel = msg.channel_post
+		return on_msg_receive(msg)
+	end
+end
+
+
 local function handle_inline_keyboards_cb(msg)
 	msg.text = '###cb:'..msg.data
 	msg.old_text = msg.message.text
@@ -390,6 +398,8 @@ while is_started do -- Start a loop while the bot should be running.
 					tomar_inline(msg)
 				elseif msg.callback_query then
 					handle_inline_keyboards_cb(msg.callback_query)
+				elseif msg.channel_post then
+					tomar_msg_canales(msg)
 				end
 				if msg.message then
 					if msg.message.migrate_to_chat_id then
