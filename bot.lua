@@ -164,7 +164,9 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 		api.sendAdmin('A loop without msg') return
 	end
 	
-	if msg.date < os.time() - 7 then return end -- Do not process old messages.
+	if msg.date then
+		if msg.date < os.time() - 7 then return end -- Do not process old messages.
+	end
 	if not msg.text then msg.text = msg.caption or '' end
 	
 	msg.normal_group = false
@@ -176,9 +178,11 @@ on_msg_receive = function(msg) -- The fn run whenever a message is received.
 	end]]
 	
 	--Group language
-	msg.ln = (db:get('lang:'..msg.chat.id)) or 'en'
+	if msg.chat then
+		msg.ln = (db:get('lang:'..msg.chat.id)) or 'en'
 	
-	collect_stats(msg) --resolve_username support, chat stats
+		collect_stats(msg) --resolve_username support, chat stats
+	end
 	
 	local stop_loop
 	for i, plugin in pairs(plugins) do
@@ -344,6 +348,13 @@ local function rethink_reply(msg)
 	return on_msg_receive(msg)
 end
 
+local function tomar_inline(msg)
+	if msg.inline_query then
+		msg.inline = msg.inline_query
+		return on_msg_receive(msg)
+	end
+end
+
 local function handle_inline_keyboards_cb(msg)
 	msg.text = '###cb:'..msg.data
 	msg.old_text = msg.message.text
@@ -370,25 +381,30 @@ while is_started do -- Start a loop while the bot should be running.
 		for i,msg in ipairs(res.result) do -- Go through every new message.
 			last_update = msg.update_id
 			current_m = current_m + 1
-			if msg.message  or msg.callback_query --[[or msg.edited_message]]then
+			if msg.message  or msg.callback_query or msg.channel_post or msg.inline_query then
 				--[[if msg.edited_message then
 					msg.message = msg.edited_message
 					msg.edited_message = nil
 				end]]
-				if msg.callback_query then
+				if msg.inline_query then
+					tomar_inline(msg)
+				elseif msg.callback_query then
 					handle_inline_keyboards_cb(msg.callback_query)
-				elseif msg.message.migrate_to_chat_id then
-					misc.to_supergroup(msg.message)
-				elseif msg.message.new_chat_member or msg.message.left_chat_member or msg.message.group_chat_created then
-					service_to_message(msg.message)
-				elseif msg.message.photo or msg.message.video or msg.message.document or msg.message.voice or msg.message.audio or msg.message.sticker or msg.message.entities then
-					media_to_msg(msg.message)
-				elseif msg.message.forward_from then
-					forward_to_msg(msg.message)
-				elseif msg.message.reply_to_message then
-					rethink_reply(msg.message)
-				else
-					on_msg_receive(msg.message)
+				end
+				if msg.message then
+					if msg.message.migrate_to_chat_id then
+						misc.to_supergroup(msg.message)
+					elseif msg.message.new_chat_member or msg.message.left_chat_member or msg.message.group_chat_created then
+						service_to_message(msg.message)
+					elseif msg.message.photo or msg.message.video or msg.message.document or msg.message.voice or msg.message.audio or msg.message.sticker or msg.message.entities then
+						media_to_msg(msg.message)
+					elseif msg.message.forward_from then
+						forward_to_msg(msg.message)
+					elseif msg.message.reply_to_message then
+						rethink_reply(msg.message)
+					else
+						on_msg_receive(msg.message)
+					end
 				end
 			end
 		end
